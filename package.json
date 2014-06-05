@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/hustxiaoc/gulp-kmc/issues"
   },
-  "homepage": "https://github.com/hustxiaoc/gulp-kmc"
+  "homepage": "https://github.com/hustxiaoc/gulp-kmc",
+  "dependencies": {
+    "gulp-util": "^2.2.16",
+    "kmc": "^1.0.37",
+    "through2": "^0.5.1"
+  }
 }
