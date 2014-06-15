@@ -33,4 +33,4 @@ gulp.task('kmc', function() {
 });
 
 gulp.task('default', ['kmc']);
-'''
+```
