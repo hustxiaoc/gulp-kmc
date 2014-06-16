@@ -36,7 +36,7 @@ kmc.config({
 
 gulp.task('kmc', function() {
 
-    return gulp.src(src+"/**/*.js")
+     gulp.src(src+"/**/*.js")
        //转换cmd模块为kissy模块
         .pipe(kmc.cmd2k({
             minify: true,//是否压缩
