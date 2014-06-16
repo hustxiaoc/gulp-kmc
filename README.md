@@ -1,3 +1,6 @@
+###安装
+npm install gulp-kmc
+
 ###使用文档
 使用之前请先用k2cmd将您的KISSY模块转为符合commonJs规范的模块，具体转换方法参考k2cmd文档 https://www.npmjs.org/package/k2cmd
 
