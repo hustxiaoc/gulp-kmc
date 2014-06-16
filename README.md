@@ -1,29 +1,41 @@
+###安装
+npm install gulp-kmc
+
 ###使用文档
 使用之前请先用k2cmd将您的KISSY模块转为符合commonJs规范的模块，具体转换方法参考k2cmd文档 https://www.npmjs.org/package/k2cmd
 
 gulfile.js 编写示例
 ```js
-var gulp = require('gulp'),
-    kmc = require('gulp-kmc');
+var gulp = require('gulp');
+
+var kmc = require('gulp-kmc');
+
+
+
+var src = "./src/mt",
+    dest = "./build/mt";
+
+kmc.config({
+           src:src,
+           dest:dest,
+           packages:[{
+                       name: 'mt',
+                       combine:true,
+                       base: dest
+                    }],
+           map: [
+                   ['mt/', 'taojie/mt/'] //修改打包路径
+               ]
+});
 
 gulp.task('kmc', function() {
-    var src = "./build_cmd/mt",
-        dest = "./build_gulp/mt";
 
-    kmc.config({
-               src:"./build_cmd/mt",
-               packages:[{
-                           name: 'mt',
-                           path: dest
-                        }]
-         });
-	//注意由于require关键字的特殊性请不要使用其他工具压缩代码！,本插件内置压缩功能，只需配置即可使用
     return gulp.src(src+"/**/*.js")
-        //将commonJs模块转为KISSY模块，并生成模块依赖关系文件
+       //转换cmd模块为kissy模块
         .pipe(kmc.cmd2k({
             minify: true,
-            exclude: ['tasks'],
-            ignoreFiles: ['.combo.js', '-min.js'],
+            exclude: ['tasks'],//忽略该目录
+            ignoreFiles: ['.combo.js', '-min.js'],//忽略该类文件
             depFilePath: dest +'/mods-dep.js'
         }))
         //合并文件
@@ -35,6 +47,7 @@ gulp.task('kmc', function() {
                    }]
          }))
         .pipe(gulp.dest(dest));
+
 });
 
 gulp.task('default', ['kmc']);
