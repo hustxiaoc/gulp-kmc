@@ -16,10 +16,18 @@ var src = "./src/mt",
     dest = "./build/mt";
 
 kmc.config({
+           depFilePath:dest+'mods-dep.js',//全局依赖文件关系，此处配置后下面的各个模块将不会再生成
            packages:[{
                        name: 'mt',
                        combine:true,
-                       base: dest
+                       base: src
+                    },
+                
+                    {
+                       name: 'udata',
+                       ignorePackageNameInUri:true, 
+                       combine:true,
+                       base: './'  //ignorePackageNameInUri为true时不用写包名
                     }],
            map: [
                    ['mt/', 'taojie/mt/'] //修改打包路径
@@ -47,6 +55,21 @@ gulp.task('kmc', function() {
                    }]
          }))
         .pipe(gulp.dest(dest));
+        
+    gulp.src("./udata/**/*.js")
+            .pipe(kmc.cmd2k({
+                ignoreFiles: ['.combo.js', '-min.js'],
+                depFilePath: dest +'/udata/mods-dep.js'
+            }))
+            .pipe(kmc.combo({
+                 minify:true,
+                 files:[{
+                           src: './udata/index.js',
+                           dest: dest+'/udata/core.js'
+                       }]
+             }))
+            .pipe(gulp.dest(dest+"/udata"));
+
 
 });
 
