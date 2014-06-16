@@ -21,7 +21,7 @@
   "homepage": "https://github.com/hustxiaoc/gulp-kmc",
   "dependencies": {
     "gulp-util": "^2.2.16",
-    "k2cmd": "0.0.28",
+    "k2cmd": "0.0.29",
     "through": "^2.3.4"
   }
 }
