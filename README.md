@@ -16,8 +16,6 @@ var src = "./src/mt",
     dest = "./build/mt";
 
 kmc.config({
-           src:src,
-           dest:dest,
            packages:[{
                        name: 'mt',
                        combine:true,
