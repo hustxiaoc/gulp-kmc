@@ -33,14 +33,16 @@ gulp.task('kmc', function() {
     return gulp.src(src+"/**/*.js")
        //转换cmd模块为kissy模块
         .pipe(kmc.cmd2k({
-            minify: true,
+            minify: true,//是否压缩
+            ext:"-min.js",//压缩文件扩展名，仅当minify为true时生效
             exclude: ['tasks'],//忽略该目录
             ignoreFiles: ['.combo.js', '-min.js'],//忽略该类文件
             depFilePath: dest +'/mods-dep.js'
         }))
         //合并文件
         .pipe(kmc.combo({
-             minify:true,
+             minify: true,//是否压缩，注意仅当cmd2k任务配置minify为true时生效！！！
+             ext:"-min.js",//压缩文件扩展名，仅当minify为true时生效
              files:[{
                        src: src+'/index.js',
                        dest: dest+'/core.js'
