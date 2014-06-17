@@ -49,7 +49,7 @@ module.exports ={
 
             if(opt.exclude) {
                 ignore = opt.exclude.some(function(item) {
-                    return file.path.indexOf(item) > -1;
+                    return file.path.indexOf(item+'/') > -1;
                 });
             }
 
