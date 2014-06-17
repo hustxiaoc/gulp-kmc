@@ -47,9 +47,19 @@ module.exports ={
 
             var ignore = false;
 
+
             if(opt.exclude) {
                 ignore = opt.exclude.some(function(item) {
-                    return file.path.indexOf(item+'/') > -1;
+                    item = item.replace(/([.$^])/g,'\\$1').replace('*','.*') + '\/';
+                    return file.path.search(new RegExp(item)) > -1;
+                });
+            }
+
+            if(opt.ignoreFiles && !ignore) {
+                ignore = opt.ignoreFiles.some(function(item) {
+                    item = item.replace(/([.$^])/g,'\\$1').replace('*','.*');
+                    return path.basename(file.path).search(new RegExp(item)) > -1;
+
                 });
             }
 
