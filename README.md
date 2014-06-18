@@ -75,8 +75,11 @@ gulp.task('kmc', function() {
 });
 
 gulp.task('default', ['kmc']);
-//or you can write like this if you wish
+```
 
+or you can write like this if you wish
+
+```js
 gulp.src([src+"/**/*.js","./taojie/**/*.js"])
         .pipe(kmc.convert({
             fixModuleName:false,
