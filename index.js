@@ -10,11 +10,7 @@ var through = require('through'),
 
 var pathSeparatorRe = /[\/\\]/g;
 
-var depMap = {},
-    realDepMap = {},
-    options = {},
-    writeTimer = null;
-
+var depMap = {};
 
 function endsWith(str, suffix) {
     var ind = str.length - suffix.length;
@@ -140,10 +136,7 @@ module.exports ={
             var self = this;
 
             buffer.forEach(function(file){
-               //console.log(file.path)
                self.push(file);
-               //console.log(file.path);
-               //self.push(file);
             });
 
             if(opt.depFilePath) {
@@ -221,21 +214,7 @@ module.exports ={
                self.push(file);
 
                var base = file.base;
-               if(file.moduleInfo==0) {
-                   var pkg = file.moduleInfo.package;
-                   //console.log(file.base+'\n'+ file.before_base+'\n'+file.path+'\n'+file.before_path);
-                   //console.log(file.moduleInfo);
-                   console.log(path.relative(pkg.base, file.before_path));
-                   console.log(pkg.name);
-                   if(!endsWith(file.base,pkg.name) || !endsWith(file.base,pkg.name+'/')) {
-                        base = path.join(file.base,pkg.name);
-                   }
-                   console.log(file.base);
-
-                   file.path = file.path.replace(file.base,base);
-                   console.log(file.path);
-                   console.log('****************************');
-               }
+               
 
                for(var f in combined){
                   var comboInfo = combined[f],
