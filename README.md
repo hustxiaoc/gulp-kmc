@@ -75,4 +75,39 @@ gulp.task('kmc', function() {
 });
 
 gulp.task('default', ['kmc']);
+//or you can write like this if you wish
+
+gulp.src([src+"/**/*.js","./taojie/**/*.js"])
+        .pipe(kmc.convert({
+            fixModuleName:false,
+            minify: true,
+            ext:{
+                src:"-debug.js",
+                min:".js"
+            },
+            exclude: ['tasks'],
+            ignoreFiles: ['.combo.js', '*-min.js'],
+            depFilePath: dest +'/mt/mods-dep.js'
+        }))
+        .pipe(kmc.combo({
+             minify:true,
+             ext:{
+                 src:"-debug.js",
+                 min:".js"
+             },
+             files:[{
+                       src: src+'/mt/index.js',
+                       dest: dest+'/mt/core.js'
+                   },
+                   {
+                      src: './taojie/index.js',
+                      dest: dest+'/taojie/core.js'
+                  }]
+         }))
+        .pipe(kmc.dest({
+                "mt" :dest+"/mt", //一起打包时可以单独设置每个包的打包路径
+                "udata" : dest+"/udata",
+                "*": dest //其他文件打包路径
+            }));
+        
 ```
