@@ -28,17 +28,14 @@ kmc.config({
                        ignorePackageNameInUri:true, 
                        combine:true,
                        base: './'  //ignorePackageNameInUri为true时不用写包名
-                    }],
-           map: [
-                   ['mt/', 'taojie/mt/'] //修改打包路径
-               ]
+                    }]
 });
 
 gulp.task('kmc', function() {
 
      gulp.src(src+"/**/*.js")
        //转换cmd模块为kissy模块
-        .pipe(kmc.cmd2k({
+        .pipe(kmc.convert({
             minify: true,//是否压缩
             ext:"-min.js",//压缩文件扩展名，仅当minify为true时生效
             exclude: ['tasks'],//忽略该目录
@@ -57,7 +54,7 @@ gulp.task('kmc', function() {
         .pipe(gulp.dest(dest));
         
     gulp.src("./udata/**/*.js")
-            .pipe(kmc.cmd2k({
+            .pipe(kmc.convert({
                 ignoreFiles: ['.combo.js', '-min.js'],
                 depFilePath: dest +'/udata/mods-dep.js'
             }))
