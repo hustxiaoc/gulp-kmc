@@ -65,9 +65,7 @@ module.exports ={
         var buffer = [],
             ext = parseExt(opt.ext);
 
-
-        options["cmd2k"] =opt||{};
-
+        opt = opt || {};
 	    function k2cmd(file) {
             /*jshint validthis:true */
             if (file.isNull()) {
@@ -166,7 +164,7 @@ module.exports ={
 
        var buffer = [];
 
-       options["combo"] =opt||{};
+       opt = opt || {};
 
        function combo(_file, callback) {
             var combinedFile = [];
@@ -226,21 +224,21 @@ module.exports ={
                self.push(file);
 
                var base = file.base;
-               if(file.moduleInfo==0) {
-                   var pkg = file.moduleInfo.package;
-                   //console.log(file.base+'\n'+ file.before_base+'\n'+file.path+'\n'+file.before_path);
-                   //console.log(file.moduleInfo);
-                   console.log(path.relative(pkg.base, file.before_path));
-                   console.log(pkg.name);
-                   if(!endsWith(file.base,pkg.name) || !endsWith(file.base,pkg.name+'/')) {
-                        base = path.join(file.base,pkg.name);
-                   }
-                   console.log(file.base);
-
-                   file.path = file.path.replace(file.base,base);
-                   console.log(file.path);
-                   console.log('****************************');
-               }
+//               if(file.moduleInfo==0) {
+//                   var pkg = file.moduleInfo.package;
+//                   //console.log(file.base+'\n'+ file.before_base+'\n'+file.path+'\n'+file.before_path);
+//                   //console.log(file.moduleInfo);
+//                   console.log(path.relative(pkg.base, file.before_path));
+//                   console.log(pkg.name);
+//                   if(!endsWith(file.base,pkg.name) || !endsWith(file.base,pkg.name+'/')) {
+//                        base = path.join(file.base,pkg.name);
+//                   }
+//                   console.log(file.base);
+//
+//                   file.path = file.path.replace(file.base,base);
+//                   console.log(file.path);
+//                   console.log('****************************');
+//               }
 
                for(var f in combined){
                   var comboInfo = combined[f],
