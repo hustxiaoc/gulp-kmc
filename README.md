@@ -44,7 +44,6 @@ gulp.task('kmc', function() {
              },
             exclude: ['tasks'],//忽略该目录
             ignoreFiles: ['.combo.js', '-min.js'],//忽略该类文件
-            depFilePath: dest +'/mods-dep.js'
         }))
         //合并文件
         .pipe(kmc.combo({
@@ -90,7 +89,6 @@ gulp.src([src+"/**/*.js","./taojie/**/*.js"])
             },
             exclude: ['tasks'],
             ignoreFiles: ['.combo.js', '*-min.js'],
-            depFilePath: dest +'/mt/mods-dep.js'
         }))
         .pipe(kmc.combo({
              minify:true,
