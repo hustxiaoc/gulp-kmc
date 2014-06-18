@@ -112,5 +112,6 @@ gulp.src([src+"/**/*.js","./taojie/**/*.js"])
                 "udata" : dest+"/udata",
                 "*": dest //其他文件打包路径
             }));
+            //注意是kmc.dest 而非gulp.dest
         
 ```
