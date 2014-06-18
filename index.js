@@ -4,13 +4,39 @@ var through = require('through'),
     PluginError = gutil.PluginError,
     fs = require('fs'),
     path = require('path'),
-	kmd = require('k2cmd');
+    minimatch = require("minimatch"),
+	kmd = require("kmd");
 
+var pathSeparatorRe = /[\/\\]/g;
 
 var depMap = {},
     realDepMap = {},
     options = {},
     writeTimer = null;
+
+
+function parseExt(ext) {
+    var _ext = {};
+
+    if(!ext) {
+        _ext = kmd.config("ext") || {
+            min:"-min.js",
+            src:".js"
+        };
+    }else if(typeof ext == "string") {
+        _ext = {
+            min:ext,
+            src:".js"
+        }
+    }else {
+        _ext = {
+            min:ext.min||"-min.js",
+            src:ext.src||".js"
+        }
+    }
+    return _ext;
+}
+
 
 function writeDepFile(filePath){
     var depFilePath = kmd.config("depFilePath");
@@ -29,8 +55,9 @@ function writeDepFile(filePath){
 
 module.exports ={
     config: kmd.config,
-    cmd2k: function(opt) {
-        var buffer = [];
+    convert: function(opt) {
+        var buffer = [],
+            ext = parseExt(opt.ext);
 
         options["cmd2k"] =opt||{};
 
@@ -47,19 +74,17 @@ module.exports ={
 
             var ignore = false;
 
-
             if(opt.exclude) {
                 ignore = opt.exclude.some(function(item) {
-                    item = item.replace(/([.$^])/g,'\\$1').replace('*','.*') + '\/';
-                    return file.path.search(new RegExp(item)) > -1;
+                    return path.dirname(file.path).split(pathSeparatorRe).some(function(pathName) {
+                        return minimatch(pathName, item);
+                    });
                 });
             }
 
-            if(opt.ignoreFiles && !ignore) {
+            if(!ignore && opt.ignoreFiles) {
                 ignore = opt.ignoreFiles.some(function(item) {
-                    item = item.replace(/([.$^])/g,'\\$1').replace('*','.*');
-                    return path.basename(file.path).search(new RegExp(item)) > -1;
-
+                    return minimatch(path.basename(file.path), item);
                 });
             }
 
@@ -69,45 +94,31 @@ module.exports ={
             }
 
             file.realPath = file.path;
-            var r = kmd.cmd2kissy2(file.contents.toString(), {
+            var r = kmd.convert(file.contents.toString(), {
                                             filePath:file.path,
-                                            fromFile:false,
-                                            minify: opt.minify
-                                        }),
-                info = r.parser;
+                                            fixModuleName:opt.fixModuleName || kmd.config("fixModuleName")
+                                        });
 
-            if(info.depMods.length && !depMap[info.moduleName.moduleName]) {
+
+            if(r.dependencies.length && !depMap[r.moduleInfo.moduleName]) {
                 var requires = [],realRequires = [];
-                info.depMods.forEach(function(dep) {
-                    requires.push(dep.moduleName);
-                    realRequires.push(dep.originalName);
+                r.dependencies.forEach(function(dep) {
+                    requires.push(dep);
+                    realRequires.push(dep);
                 });
-                realDepMap[info.moduleName.originalName] = { requires: realRequires };
-                depMap[info.moduleName.moduleName] = { requires: requires };
+                realDepMap[r.moduleInfo.moduleName] = { requires: realRequires };
+                depMap[r.moduleInfo.moduleName] = { requires: requires };
             }
 
             if(opt.minify) {
-                var ext = opt.ext || "-min.js";
-                var filePath = file.path.replace(/\.js$/, ext);
-
                 buffer.push(new gutil.File({
-                    contents:new Buffer(r.code.minifyCode),
-                    path:filePath,
+                    contents:new Buffer(r.minify),
+                    path:file.path.replace(/\.js$/, ext.min),
                     base:file.base
                 }));
             }
-
-            try {
-                file.contents = new Buffer(r.code.wrappedCode);
-            } catch (e) {
-                return callback({
-                    fileName: file.path,
-                    lineNumber: e.line,
-                    stack: e.stack,
-                    showStack: false
-                });
-            }
-
+            file.path = file.path.replace(/\.js$/,ext.src);
+            file.contents = new Buffer(r.source);
             buffer.push(file);
 
         }
@@ -132,6 +143,7 @@ module.exports ={
     combo: function(opt) {
 
        var combined = {},
+           ext = parseExt(opt.ext),
            config = null;
 
        var buffer = [];
@@ -148,29 +160,32 @@ module.exports ={
             if(opt && opt.files && opt.files.length) {
                 opt.files.forEach(function(file){
                     if(path.resolve(file.src) == _file.path){
-                       combined[_file.path] = {
-                          files:[],
-                          contents:[],
-                          dest:file.dest
-                       };
+
+                       var info = kmd.combo(_file.path);
+
+                       buffer.push(new gutil.File({
+                           base:path.dirname(file.dest),
+                           path:file.dest.replace(/\.js$/,ext.src),
+                           contents: new Buffer(info.source.join("\n"))
+                       }));
 
                        if(opt.minify) {
-                           if(options["cmd2k"].minify) {
-                                var ext = opt.ext || "-min.js",
-                                   mPath = _file.path.replace(/\.js$/,ext);
-
-                                combined[mPath] = {
-                                  files:[],
-                                  contents:[],
-                                  minify:true,
-                                  dest:file.dest.replace(/\.js$/,ext)
-                                };
-                           }else{
-                               gutil.log(gutil.colors.red('build combined  file needs to set cmd2k task options.minify true!'));
-                           }
+                            buffer.push(new gutil.File({
+                               base:path.dirname(file.dest),
+                               path:file.dest.replace(/\.js$/,ext.min),
+                               contents: new Buffer(info.minify.join(""))
+                            }));
                        }
 
-                       kmd.comboAsync(_file.path, callback);
+                       gutil.log('combined  file ' + gutil.colors.green(file.dest) + ' is created.');
+
+//                       "/*\ncombined files by KMD:\n" + modsName.join("\n")+"\n*/\n";
+//                       combined[_file.path] = {
+//                          files:[],
+//                          contents:[],
+//                          dest:file.dest
+//                       };
+
                     }
                 });
             }
@@ -194,16 +209,6 @@ module.exports ={
                   }
                }
            });
-           for(var f in combined){
-               var comboInfo = combined[f];
-
-               this.push(new gutil.File({
-                    base:path.dirname(comboInfo.dest),
-                    path:comboInfo.dest,
-                    contents: new Buffer(comboInfo.contents.join(comboInfo.minify?"" : "\n"))
-               }));
-               gutil.log('combined  file ' + gutil.colors.green(comboInfo.dest) + ' is created.');
-           }
 
            this.emit('end');
        }
@@ -226,31 +231,8 @@ module.exports ={
                 }));
             }
 
-            combo(file, function(mods){
-                var files = [],
-                    minifyFiles = [],
-                    modsName= [];
+            combo(file);
 
-                mods.forEach(function(mod){
-                    var url = path.resolve(mod.url);
-                    files.push(url);
-                    if(opt.minify && options["cmd2k"].minify) {
-                        var ext = options["cmd2k"].ext || "-min.js";
-                        minifyFiles.push(url.replace(/\.js$/,ext));
-                    }
-                    modsName.push(kmd.getMapModuleName(mod.name));
-                });
-                combined[file.path].files = files;
-
-                if(opt.minify&&options["cmd2k"].minify) {
-                   var ext = opt.ext || "-min.js",
-                       mPath = file.path.replace(/\.js$/,ext);
-
-                    combined[mPath].files = minifyFiles;
-                }
-                combined[file.path].contents.push("/*\ncombined files by KMD:\n" + modsName.join("\n")+"\n*/\n");
-            });
-            file.realPath = file.path;
             buffer.push(file);
 
         },endStream);
