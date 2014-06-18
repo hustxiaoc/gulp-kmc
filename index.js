@@ -6,7 +6,7 @@ var through = require('through'),
     path = require('path'),
     minimatch = require("minimatch"),
     gulp = require("gulp"),
-	kmd = require("kmd");
+    kmd = require("kmd");
 
 var pathSeparatorRe = /[\/\\]/g;
 
@@ -124,15 +124,12 @@ module.exports ={
                                    base:file.base
                                });
                 new_file.moduleInfo = r.moduleInfo;
-                new_file.before_path = file.path;
                 buffer.push(new_file);
 
             }
 
             file.path = file.path.replace(/\.js$/,ext.src);
             file.contents = new Buffer(r.source);
-            file.before_path = file.path;
-            file.before_base = file.base;
             file.moduleInfo = r.moduleInfo;
             buffer.push(file);
 
@@ -188,7 +185,6 @@ module.exports ={
                                         contents: new Buffer(info.source.join("\n"))
                                     });
                        srcFile.moduleInfo = _file.moduleInfo;
-                       srcFile.before_path = _file.before_path;
                        buffer.push(srcFile);
 
                        if(opt.minify) {
@@ -198,7 +194,6 @@ module.exports ={
                                                 contents: new Buffer(info.minify.join(""))
                                              });
                             minifyFile.moduleInfo = _file.moduleInfo;
-                            minifyFile.before_path = _file.before_path;
                             buffer.push(minifyFile);
                        }
 
