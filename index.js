@@ -59,12 +59,12 @@ module.exports ={
     config: kmd.config,
     convert: function(opt) {
         var buffer = [],
+            opt = opt||{},
             ext = parseExt(opt.ext);
 
 
-        options["cmd2k"] =opt||{};
 
-	    function k2cmd(file) {
+	    function convert(file) {
             /*jshint validthis:true */
             if (file.isNull()) {
                 return;
@@ -146,17 +146,17 @@ module.exports ={
 
         }
 
-	    return through(k2cmd, endStream);
+	    return through(convert, endStream);
     },
     combo: function(opt) {
 
        var combined = {},
+           opt = opt || {},
            ext = parseExt(opt.ext),
            config = null;
 
        var buffer = [];
 
-       options["combo"] =opt||{};
 
        function combo(_file, callback) {
             var combinedFile = [];
