@@ -15,6 +15,16 @@ var kmc = require('gulp-kmc');
 var src = "./src/mt",
     dest = "./build/mt";
 
+//本次升级新增编译xtpl功能
+
+gulp.task('xtpl', function() {
+
+     gulp.src(src+"/**/*.xtpl.html")
+         .pipe(kmc.xtpl())
+         .pipe(gulp.dest(dest));
+     //会编译成不带KISSY.add的cmd风格js
+});
+
 kmc.config({
            depFilePath:dest+'mods-dep.js',//全局依赖文件关系，此处配置后下面的各个模块将不会再生成
            packages:[{
