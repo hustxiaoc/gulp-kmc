@@ -14,6 +14,18 @@ var kmc = require('gulp-kmc');
 var src = "./src/mt",
     dest = "./build/mt";
 
+<<<<<<< HEAD
+=======
+//本次升级新增编译xtpl功能
+
+gulp.task('xtpl', function() {
+
+     gulp.src(src+"/**/*.xtpl.html")
+         .pipe(kmc.xtpl())
+         .pipe(gulp.dest(dest));
+     //会编译成不带KISSY.add的cmd风格js
+});
+>>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
 
 kmc.config({
            packages:[{
@@ -37,7 +49,11 @@ gulp.task('kmc', function() {
         .pipe(kmc.convert({
             kissy: true, // modulex: true , define: true
             exclude: ['tasks'],//忽略该目录
+<<<<<<< HEAD
             ignoreFiles: ['.combo.js', '-min.js']//忽略该类文件
+=======
+            ignoreFiles: ['.combo.js', '-min.js'],//忽略该类文件
+>>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
         }))
         //合并文件
         .pipe(kmc.combo({
@@ -74,7 +90,11 @@ gulp.src([src+"/**/*.js","./taojie/**/*.js"])
         .pipe(kmc.convert({
             minify: true,
             exclude: ['tasks'],
+<<<<<<< HEAD
             ignoreFiles: ['.combo.js', '*-min.js']
+=======
+            ignoreFiles: ['.combo.js', '*-min.js'],
+>>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
         }))
         .pipe(kmc.combo({
              files:[{

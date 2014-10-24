@@ -1,6 +1,10 @@
 {
   "name": "gulp-kmc",
+<<<<<<< HEAD
   "version": "1.0.3",
+=======
+  "version": "0.0.26",
+>>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
   "description": "kissy module compiler for gulp",
   "main": "index.js",
   "scripts": {
@@ -21,9 +25,18 @@
   "homepage": "https://github.com/hustxiaoc/gulp-kmc",
   "dependencies": {
     "gulp-util": "^2.2.16",
+<<<<<<< HEAD
     "kmd": "1.0.3",
+=======
+    "kissy-xtemplate": "^0.2.0",
+    "kmd": "0.0.5",
+>>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
     "minimatch": "0.3.0",
     "through2": "^0.5.1"
   },
   "readmeFilename": "README.md"
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
