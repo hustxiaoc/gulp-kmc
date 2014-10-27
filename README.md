@@ -18,13 +18,10 @@ var src = "./src/mt",
 kmc.config({
            packages:[{
                        name: 'mt',
-                       combine:true,
                        base: src
                     },
                     {
                        name: 'udata',
-                       ignorePackageNameInUri:true, 
-                       combine:true,
                        base: './'  //ignorePackageNameInUri为true时不用写包名
                     }]
 });
@@ -78,7 +75,6 @@ or you can write like this if you wish
 ```js
 gulp.src([src+"/**/*.js","./taojie/**/*.js"])
         .pipe(kmc.convert({
-            minify: true,
             exclude: ['tasks'],
             ignoreFiles: ['.combo.js', '*-min.js']
         }))
