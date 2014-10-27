@@ -1,15 +1,12 @@
 'use strict';
 var through2 = require('through2'),
-<<<<<<< HEAD
-=======
-    Xtemplate = require('kissy-xtemplate'),
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
     gutil = require('gulp-util'),
     PluginError = gutil.PluginError,
     path = require('path'),
     minimatch = require("minimatch"),
     gulp = require("gulp"),
-	kmd = require("kmd");
+    server = require('./server'),
+    kmd = require("kmd");
 
 var pathSeparatorRe = /[\/\\]/g;
 
@@ -18,94 +15,19 @@ var depMap = {},
 
 var moduleCache = {};
 
-<<<<<<< HEAD
 function kmc(){
 
 }
 
 kmd.utils.mix(kmc, {
-=======
-function endsWith(str, suffix) {
-    var ind = str.length - suffix.length;
-    return ind >= 0 && str.indexOf(suffix, ind) === ind;
-}
-
-function parseExt(ext) {
-    var _ext = {};
-
-    if(!ext) {
-        _ext = kmd.config("ext") || {
-            min:"-min.js",
-            src:".js"
-        };
-    }else if(typeof ext == "string") {
-        _ext = {
-            min:ext,
-            src:".js"
-        }
-    }else {
-        _ext = {
-            min:ext.min||"-min.js",
-            src:ext.src||".js"
-        }
-    }
-    return _ext;
-}
-
-
-module.exports ={
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
     config: kmd.config,
-    xtpl: function (options) {
-
-            options = options || {};
-            options.outputCharset = options.outputCharset || 'utf8';
-            options.inputCharset = options.inputCharset || 'utf8';
-
-            var xtemp = new Xtemplate(options);
-
-        	return through2.obj(function (file, enc, callback ) {
-        		if (file.isNull()) {
-        			this.push(file);
-        			return cb();
-        		}
-
-        		if (file.isStream()) {
-        			this.emit('error', new gutil.PluginError('gulp-kmc', 'Streaming not supported'));
-        			return cb();
-        		}
-
-        		try {
-                    if(file && file.path){
-                        file.path = file.path.replace('.xtpl.html', '-xtpl.js');
-                    }
-                    var code = xtemp._compile(file.contents.toString(), file.path, options.inputCharset, options.outputCharset);
-                    code = kmd.kissy2cmd.parse(code.toString(),{fromString:true});
-        			file.contents = new Buffer(code);
-        		} catch (err) {
-        			this.emit('error', new gutil.PluginError('gulp-kmc', err));
-        		}
-
-        		this.push(file);
-        		return callback();
-        	});
-        },
     convert: function(opt) {
         var buffer = [],
-<<<<<<< HEAD
             opt = opt||{};
 
         opt = opt || {};
 
 	    function handle(file, enc, callback) {
-=======
-            opt = opt||{},
-            ext = parseExt(opt.ext);
-
-        opt = opt || {};
-
-	    function k2cmd(file, enc, callback) {
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
             if (file.isNull()) {
                 return callback();
             }
@@ -136,76 +58,25 @@ module.exports ={
             }
 
             var r = kmd.convert(file.contents.toString(), {
-<<<<<<< HEAD
                         filePath:file.path,
                         define:opt.define,
                         modulex: opt.modulex,
                         kissy: opt.kissy
                     });
-=======
-                                            filePath:file.path,
-                                            fixModuleName:opt.fixModuleName || kmd.config("fixModuleName")
-                                        });
 
-
-            if(r.dependencies.length && !depMap[r.moduleInfo.moduleName]) {
-                var requires = [],realRequires = [];
-                r.dependencies.forEach(function(dep) {
-                    requires.push(dep);
-                    realRequires.push(dep);
-                });
-                realDepMap[r.moduleInfo.moduleName] = { requires: realRequires };
-                depMap[r.moduleInfo.moduleName] = { requires: requires };
-            }
-
-            if(opt.minify) {
-                var new_path = file.path.replace(/\.js$/, ext.min),
-                    new_file = new gutil.File({
-                                   contents:new Buffer(r.minify),
-                                   path:new_path,
-                                   base:file.base
-                               });
-                new_file.moduleInfo = r.moduleInfo;
-                buffer.push(new_file);
-
-            }
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
-
+            process.nextTick(function(){
+                server.config.define = opt.define;
+                server.config.modulex = opt.modulex;
+                server.config.kissy = opt.kissy;
+            });
             file.contents = new Buffer(r.source);
-<<<<<<< HEAD
             file.info = r;
             moduleCache[r.moduleInfo.moduleName] = file;
-=======
-            file.moduleInfo = r.moduleInfo;
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
             buffer.push(file);
             callback(null);
         }
 
         function endStream(callback) {
-<<<<<<< HEAD
-=======
-            kmd.config("modules",realDepMap);
-
-            if(kmd.config("depFilePath")) {
-                var depFilePath = kmd.config("depFilePath");
-
-                var code ="/*generated by KMD*/\nKISSY.config('modules'," + JSON.stringify(depMap,null,4) +');'
-
-
-                this.push(new gutil.File({
-                     contents:new Buffer(code),
-                     path:depFilePath.replace(/\.js$/,ext.src),
-                     base:path.dirname(depFilePath)
-                }));
-
-                this.push(new gutil.File({
-                     contents:new Buffer(kmd.minify(code)),
-                     path:depFilePath.replace(/\.js$/,ext.min),
-                     base:path.dirname(depFilePath)
-                }));
-            }
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
             var self = this;
 
             buffer.forEach(function(file){
@@ -214,77 +85,21 @@ module.exports ={
             return callback();
         }
 
-<<<<<<< HEAD
 	    return through2.obj(handle, endStream);
-=======
-	    return through2.obj(k2cmd, endStream);
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
     },
     combo: function(opt) {
 
        var combined = {},
            opt = opt || {},
-<<<<<<< HEAD
            combo_files = opt.files,
            modules = [],
-=======
-           ext = parseExt(opt.ext),
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
            config = null;
 
        var buffer = [];
 
        opt = opt || {};
-<<<<<<< HEAD
 
        function endStream(callback) {
-=======
-
-       function combo(_file, callback) {
-            var combinedFile = [];
-
-            if(combined[_file.path]) {
-                return combinedFile;
-            }
-
-            if(opt && opt.files && opt.files.length) {
-                opt.files.forEach(function(file){
-                    if(path.resolve(file.src) == _file.path){
-                       var info = kmd.combo(_file.path),
-                           src = file.dest.replace(/\.js$/,ext.src),
-                           dest = file.dest.replace(/\.js$/,ext.min);
-
-                       var extra = "/*\n"+ new Date() +"\ncombined files by KMD:\n\n" + info.files.join("\n")+"\n*/\n\n";
-
-                       var srcFile = new gutil.File({
-                                        base:path.dirname(file.dest),
-                                        path:src,
-                                        contents: new Buffer(extra+info.source.join("\n"))
-                                    });
-
-                       srcFile.moduleInfo = _file.moduleInfo;
-                       buffer.push(srcFile);
-
-                       if(opt.minify) {
-                            var minifyFile = new gutil.File({
-                                                base:path.dirname(file.dest),
-                                                path:dest,
-                                                contents: new Buffer(info.minify.join(""))
-                                             });
-                            minifyFile.moduleInfo = _file.moduleInfo;
-                            buffer.push(minifyFile);
-                       }
-
-                       gutil.log('combined  file ' + gutil.colors.green(file.dest) + ' is created.');
-
-                    }
-                });
-            }
-       }
-
-       function endStream(callback) {
-           if (buffer.length === 0) return this.emit('end');
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
            var self = this;
            if (buffer.length === 0) return this.emit('end');
            kmd.config("requires",realDepMap);
@@ -361,11 +176,7 @@ module.exports ={
                });
            }
 
-<<<<<<< HEAD
            buffer.forEach(function(file){
-=======
-           buffer.reverse().forEach(function(file){
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
                self.push(file);
            });
 
@@ -381,7 +192,6 @@ module.exports ={
                 this.emit('error', new PluginError('gulp-kmc',  'Streaming not supported'));
                 return callback();
             }
-<<<<<<< HEAD
 
             var r = file.info;
             if(!r) {
@@ -404,11 +214,6 @@ module.exports ={
             }
 
             modules.push(file.info.moduleInfo.moduleName);
-=======
-
-            combo(file);
-
->>>>>>> a98c389dfaa5eab34fc62ea3f90d1209d2b7e891
             buffer.push(file);
             return callback();
         },endStream);
@@ -438,6 +243,12 @@ module.exports ={
             }
             gulp.dest.call(gulp, folder, opt).write(file);
             return callback();
+        });
+    },
+
+    server: function(config) {
+        process.nextTick(function(){
+            server(config);
         });
     }
 });
