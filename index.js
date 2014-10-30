@@ -258,4 +258,12 @@ kmd.utils.mix(kmc, {
     }
 });
 
+process.on('uncaughtException', function(err){
+    server.send({
+        cmd: 'exit'
+    });
+    server.on('exit', function(){
+        process.exit(1);
+    });
+});
 module.exports = exports =  kmc;

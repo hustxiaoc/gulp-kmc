@@ -120,5 +120,7 @@ process.on('message', function(msg) {
       extend(options, data);
   }else if(cmd == 'start') {
     startServer(data.config, data.packages);
+  }else if(cmd == 'exit') {
+    process.exit(1);
   }
 });
