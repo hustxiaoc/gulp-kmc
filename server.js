@@ -5,6 +5,7 @@ var http = require('http'),
     kmd = require("kmd"),
     mime = require('mime'),
     packages,
+    options = {},
     config = {};
 
 function isObject(obj) {
@@ -32,10 +33,10 @@ var header = {
 }
 
 function getHeader() {
-    if(config.kissy) {
+    if(options.kissy) {
         return header['kissy']
     }
-    if(config.modulex) {
+    if(options.modulex) {
         return header['modulex']
     }
     return header['define'];
@@ -48,7 +49,7 @@ function httpHandle (req, res){
 
         var info = packages[temp[0]];
 
-        var paths = []
+        var paths = [];
         if(info) {
              paths.push(path.join(info.base, pathname.replace(temp[0],'')));
         }
@@ -68,6 +69,11 @@ function httpHandle (req, res){
                     fs.createReadStream(filename)
                       .on('end', function(){
                          more && res.end('\n});');
+                      })
+                      .on('error', function(err){
+                            res.writeHead(404);
+                            res.end('not Found');
+                            paths.length = 0;
                       })
                       .pipe(res);
                 }else {
@@ -93,15 +99,26 @@ function httpHandle (req, res){
     }
 }
 
-module.exports = exports = function(_config){
+function startServer(_config, _packages){
     if(!isObject(_config)) {
         _config = {};
     }
     extend(config, {port:8080,path:'./build', fixModule: false} ,_config);
-    packages = kmd.config('packages');
+    packages = _packages;
+    kmd.config('packages',packages);
     return http.createServer(httpHandle).listen(config.port, function(){
                 console.log('kmc server running at %s',config.port);
            });
 }
 
 exports.config = config;
+
+process.on('message', function(msg) {
+  var cmd = msg.cmd,
+      data = msg.data;
+  if(cmd == 'config') {
+      extend(options, data);
+  }else if(cmd == 'start') {
+    startServer(data.config, data.packages);
+  }
+});

@@ -22,7 +22,7 @@ kmc.config({
                     },
                     {
                        name: 'udata',
-                       base: './'  //ignorePackageNameInUri为true时不用写包名
+                       base: './'
                     }]
 });
 

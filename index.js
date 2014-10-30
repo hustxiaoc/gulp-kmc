@@ -5,7 +5,8 @@ var through2 = require('through2'),
     path = require('path'),
     minimatch = require("minimatch"),
     gulp = require("gulp"),
-    server = require('./server'),
+    child_process = require('child_process'),
+    server = child_process.fork(path.resolve(__dirname,'./server.js')),
     kmd = require("kmd");
 
 var pathSeparatorRe = /[\/\\]/g;
@@ -64,11 +65,11 @@ kmd.utils.mix(kmc, {
                         kissy: opt.kissy
                     });
 
-            process.nextTick(function(){
-                server.config.define = opt.define;
-                server.config.modulex = opt.modulex;
-                server.config.kissy = opt.kissy;
+            server.send({
+                cmd:'config',
+                data:opt
             });
+
             file.contents = new Buffer(r.source);
             file.info = r;
             moduleCache[r.moduleInfo.moduleName] = file;
@@ -247,8 +248,12 @@ kmd.utils.mix(kmc, {
     },
 
     server: function(config) {
-        process.nextTick(function(){
-            server(config);
+        server.send({
+            cmd:'start',
+            data:{
+                config: config,
+                packages: kmd.config('packages')
+            }
         });
     }
 });
