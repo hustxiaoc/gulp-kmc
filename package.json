@@ -1,6 +1,6 @@
 {
   "name": "gulp-kmc",
-  "version": "1.0.10",
+  "version": "1.0.20",
   "description": "kissy module compiler for gulp",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   "homepage": "https://github.com/hustxiaoc/gulp-kmc",
   "dependencies": {
     "gulp-util": "^2.2.16",
-    "kmd": "^1.0.7",
+    "kmd": "^1.0.20",
     "minimatch": "0.3.0",
     "through2": "^0.5.1",
     "mime": ">=1.2.9"

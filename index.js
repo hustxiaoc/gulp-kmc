@@ -6,10 +6,11 @@ var through2 = require('through2'),
     minimatch = require("minimatch"),
     gulp = require("gulp"),
     child_process = require('child_process'),
-    server = child_process.fork(path.resolve(__dirname,'./server.js')),
     kmd = require("kmd");
 
 var pathSeparatorRe = /[\/\\]/g;
+
+var server ;
 
 var depMap = {},
     realDepMap = {};
@@ -27,7 +28,7 @@ kmd.utils.mix(kmc, {
             opt = opt||{};
 
         opt = opt || {};
-
+        
 	    function handle(file, enc, callback) {
             if (file.isNull()) {
                 return callback();
@@ -62,13 +63,9 @@ kmd.utils.mix(kmc, {
                         filePath:file.path,
                         define:opt.define,
                         modulex: opt.modulex,
-                        kissy: opt.kissy
+                        kissy: opt.kissy,
+                        requireCss: opt.requireCss
                     });
-
-            server.send({
-                cmd:'config',
-                data:opt
-            });
 
             file.contents = new Buffer(r.source);
             file.info = r;
@@ -248,6 +245,7 @@ kmd.utils.mix(kmc, {
     },
 
     server: function(config) {
+        server = child_process.fork(path.resolve(__dirname,'./server.js'));
         server.send({
             cmd:'start',
             data:{
@@ -259,11 +257,14 @@ kmd.utils.mix(kmc, {
 });
 
 process.on('uncaughtException', function(err){
+    if(!server) {
+        throw err;
+    }
     server.send({
         cmd: 'exit'
     });
     server.on('exit', function(){
-        process.exit(1);
+        throw err;
     });
 });
 module.exports = exports =  kmc;

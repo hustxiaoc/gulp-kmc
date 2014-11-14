@@ -40,7 +40,8 @@ gulp.task('kmc', function() {
         .pipe(kmc.convert({
             kissy: true, // modulex: true , define: true
             exclude: ['tasks'],//忽略该目录
-            ignoreFiles: ['.combo.js', '-min.js']//忽略该类文件
+            ignoreFiles: ['.combo.js', '-min.js'],//忽略该类文件,
+            requireCss: false //是否保留js源码中的require('./xxx.css) 默认true
         }))
         //合并文件
         .pipe(kmc.combo({

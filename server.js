@@ -5,7 +5,6 @@ var http = require('http'),
     kmd = require("kmd"),
     mime = require('mime'),
     packages,
-    options = {},
     config = {};
 
 function isObject(obj) {
@@ -33,10 +32,10 @@ var header = {
 }
 
 function getHeader() {
-    if(options.kissy) {
+    if(config.kissy) {
         return header['kissy']
     }
-    if(options.modulex) {
+    if(config.modulex) {
         return header['modulex']
     }
     return header['define'];
@@ -45,6 +44,7 @@ function httpHandle (req, res){
     try{
         var url = req.url,
             pathname = urlParse.parse(req.url).pathname,
+            extname = path.extname(pathname),
             temp = pathname.split('/').filter(function(item){return item&&item.trim()});
 
         var info = packages[temp[0]];
@@ -62,6 +62,10 @@ function httpHandle (req, res){
         while(paths.length) {
             var filename = paths.pop();
             if(filename && fs.existsSync(filename)){
+                if(extname != '.js') {
+                    info = false;
+                }
+
                 res.writeHead(200, {'Content-Type': mime.lookup(filename)});
                 if(!config.fixModule||!info) {
                     var more = i==0 && info;
@@ -78,6 +82,9 @@ function httpHandle (req, res){
                       .pipe(res);
                 }else {
                     var code = fs.readFileSync(filename).toString('utf-8');
+                    if(i>0) {
+                        return res.end(code);
+                    }
                     code = kmd.convert(code, {
                                                 filePath:filename,
                                                 define:config.define,
@@ -103,6 +110,7 @@ function startServer(_config, _packages){
     if(!isObject(_config)) {
         _config = {};
     }
+
     extend(config, {port:8080,path:'./build', fixModule: false} ,_config);
     packages = _packages;
     kmd.config('packages',packages);
@@ -113,13 +121,18 @@ function startServer(_config, _packages){
 
 exports.config = config;
 
+var started = false;
 process.on('message', function(msg) {
   var cmd = msg.cmd,
       data = msg.data;
-  if(cmd == 'config') {
-      extend(options, data);
-  }else if(cmd == 'start') {
-    startServer(data.config, data.packages);
+
+  if(cmd == 'start') {
+    if(!started) {
+        started = true;
+        process.nextTick(function(){
+            startServer(data.config, data.packages);
+        });
+    }
   }else if(cmd == 'exit') {
     process.exit(1);
   }
