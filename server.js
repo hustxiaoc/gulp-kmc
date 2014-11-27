@@ -43,15 +43,26 @@ function getHeader() {
 function httpHandle (req, res){
     try{
         var url = req.url,
-            pathname = urlParse.parse(req.url).pathname,
-            extname = path.extname(pathname),
-            temp = pathname.split('/').filter(function(item){return item&&item.trim()});
+            pathname = urlParse.parse(req.url).pathname.slice(1),
+            temp = pathname.split('/').filter(function(item){return item&&item.trim()}),
+            keys = Object.keys(packages).sort(function(b,a){ return a.length - b.length}),
+            info;
 
-        var info = packages[temp[0]];
+        keys.some(function(key){
+            if(pathname.indexOf(key) ==0) {
+                var s = pathname.replace(key,'');
+                if(s && s.charAt(0) == '/') {
+                    info = packages[key];
+                    return true;
+                }
+            }
+            return  false;
+        });
 
         var paths = [];
+
         if(info) {
-             paths.push(path.join(info.base, pathname.replace(temp[0],'')));
+             paths.push(path.join(info.base, pathname.replace(info.name,'')));
         }
 
         paths.push(path.join(config['path'], pathname));
@@ -59,13 +70,10 @@ function httpHandle (req, res){
         paths.reverse();
 
         var i = 0;
+
         while(paths.length) {
             var filename = paths.pop();
             if(filename && fs.existsSync(filename)){
-                if(extname != '.js') {
-                    info = false;
-                }
-
                 res.writeHead(200, {'Content-Type': mime.lookup(filename)});
                 if(!config.fixModule||!info) {
                     var more = i==0 && info;
