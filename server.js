@@ -42,8 +42,33 @@ function getHeader() {
 }
 function httpHandle (req, res){
     try{
-        var url = req.url,
-            pathname = urlParse.parse(req.url).pathname.slice(1),
+        var url = req.url,proxy = config.proxy;
+
+        if(proxy && proxy.length) {
+            proxy.some(function(item){
+                var reg = item[0];
+                if(reg.charAt(0) =='/' && reg.slice(-1) == '/') {
+                    reg = new RegExp(reg.slice(1,-1));
+                }
+
+                if(reg.test && reg.test(url) || url.indexOf(reg)>-1) {
+                    url = url.replace(reg, item[1]);
+                    return true;
+                }
+            });
+        }
+
+        if(url.indexOf('http://')==0 || url.indexOf('http://') ==0 ) {
+                return http.get(url, function(_res){
+                             _res.pipe(res);
+                        })
+                        .on('error', function(err){
+                            res.end(err.toString());
+                         })
+                        .end();
+        }
+
+        var pathname = urlParse.parse(url).pathname.slice(1),
             temp = pathname.split('/').filter(function(item){return item&&item.trim()}),
             keys = Object.keys(packages).sort(function(b,a){ return a.length - b.length}),
             info;
@@ -72,8 +97,14 @@ function httpHandle (req, res){
         var i = 0;
 
         while(paths.length) {
-            var filename = paths.pop();
+            var filename = paths.pop(),
+                extname = path.extname(pathname);
+
             if(filename && fs.existsSync(filename)){
+                if(extname != '.js') {
+                    info = false;
+                }
+
                 res.writeHead(200, {'Content-Type': mime.lookup(filename)});
                 if(!config.fixModule||!info) {
                     var more = i==0 && info;

@@ -63,8 +63,7 @@ kmd.utils.mix(kmc, {
                         filePath:file.path,
                         define:opt.define,
                         modulex: opt.modulex,
-                        kissy: opt.kissy,
-                        requireCss: opt.requireCss
+                        kissy: opt.kissy
                     });
 
             file.contents = new Buffer(r.source);
@@ -246,6 +245,14 @@ kmd.utils.mix(kmc, {
 
     server: function(config) {
         server = child_process.fork(path.resolve(__dirname,'./server.js'));
+
+        if(config.proxy) {
+            config.proxy = config.proxy.map(function(item){
+                item[0] = item[0].toString();
+                return item;
+            });
+        }
+
         server.send({
             cmd:'start',
             data:{
