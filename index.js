@@ -63,7 +63,8 @@ kmd.utils.mix(kmc, {
                         filePath:file.path,
                         define:opt.define,
                         modulex: opt.modulex,
-                        kissy: opt.kissy
+                        kissy: opt.kissy,
+                        requireCss: opt.requireCss
                     });
 
             file.contents = new Buffer(r.source);
