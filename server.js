@@ -7,6 +7,7 @@ var http = require('http'),
     packages,
     config = {};
 
+
 function isObject(obj) {
     var type = typeof obj;
     return type === 'function' || type === 'object' && !!obj;
@@ -40,6 +41,7 @@ function getHeader() {
     }
     return header['define'];
 }
+
 function httpHandle (req, res){
     try{
         var url = req.url,proxy = config.proxy;
@@ -124,6 +126,7 @@ function httpHandle (req, res){
                     if(i>0) {
                         return res.end(code);
                     }
+
                     code = kmd.convert(code, {
                                                 filePath:filename,
                                                 define:config.define,
