@@ -55,6 +55,7 @@ kmd.utils.mix(kmc, {
             }
 
             if(ignore) {
+                file.ignore = true;
                 this.push(file);
                 return callback();
             }
@@ -188,6 +189,11 @@ kmd.utils.mix(kmc, {
 
             if (file.isStream()) {
                 this.emit('error', new PluginError('gulp-kmc',  'Streaming not supported'));
+                return callback();
+            }
+
+            if(file.ignore) {
+                buffer.push(file);
                 return callback();
             }
 
