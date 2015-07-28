@@ -1,7 +1,7 @@
-###安装
+### 安装
 npm install gulp-kmc
 
-###使用文档
+### 使用文档
 
 gulfile.js 编写示例
 ```js

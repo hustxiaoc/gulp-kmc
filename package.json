@@ -1,6 +1,6 @@
 {
   "name": "gulp-kmc",
-  "version": "1.0.28",
+  "version": "1.0.29",
   "description": "kissy module compiler for gulp",
   "main": "index.js",
   "scripts": {
@@ -24,7 +24,8 @@
     "kmd": "^1.0.27",
     "minimatch": "0.3.0",
     "through2": "^0.5.1",
-    "mime": ">=1.2.9"
+    "mime": ">=1.2.9",
+    "react-tools": "0.12.2"
   },
   "readmeFilename": "README.md"
 }

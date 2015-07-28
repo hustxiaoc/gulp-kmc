@@ -7,6 +7,7 @@ var http = require('http'),
     packages,
     config = {};
 
+var react = require('react-tools');
 
 function isObject(obj) {
     var type = typeof obj;
@@ -107,7 +108,7 @@ function httpHandle (req, res){
                     info = false;
                 }
 
-                res.writeHead(200, {'Content-Type': mime.lookup(filename)});
+                res.writeHead(200, {'Content-Type': mime.lookup(filename),"Access-Control-Allow-Origin":"*"});
                 if(!config.fixModule||!info) {
                     var more = i==0 && info;
                     more && res.write(getHeader());
@@ -123,6 +124,7 @@ function httpHandle (req, res){
                       .pipe(res);
                 }else {
                     var code = fs.readFileSync(filename).toString('utf-8');
+                    code = react.transform(code);
                     if(i>0) {
                         return res.end(code);
                     }
