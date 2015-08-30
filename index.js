@@ -108,7 +108,7 @@ kmd.utils.mix(kmc, {
                combo_files.forEach(function(file){
                    var moduleName,
                        has = modules.some(function(f){
-                                   var pkgName = f.split('/')[0];
+                                   var pkgName = f.split(path.sep)[0];
                                    if(file.src.indexOf(pkgName)!==0) {
                                       file.src = path.join(pkgName, file.src);
                                    }
