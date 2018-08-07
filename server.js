@@ -108,7 +108,7 @@ function httpHandle (req, res){
                     info = false;
                 }
 
-                res.writeHead(200, {'Content-Type': mime.lookup(filename),"Access-Control-Allow-Origin":"*"});
+                res.writeHead(200, {'Content-Type': mime.getType(filename),"Access-Control-Allow-Origin":"*"});
                 if(!config.fixModule||!info) {
                     var more = i==0 && info;
                     more && res.write(getHeader());
